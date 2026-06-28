@@ -1,0 +1,393 @@
+/**
+ * Layout Custom Properties & Stylesheet for VA-Requirement-Admin-Suite
+ *
+ * @package va-requirement-suite
+ * @author  Vivek Agrawal
+ */
+
+/* ==========================================================================
+   1. VARIABLES & THEME ROOT
+   ========================================================================== */
+:root {
+    --va-bg-primary: #f0f2f5;
+    --va-bg-card: #ffffff;
+    --va-text-main: #1d2327;
+    --va-text-muted: #646970;
+    --va-border-color: #dcdcde;
+    
+    /* State & Workflow Color Semantics */
+    --va-color-requirement: #007cba;
+    --va-color-feature: #2271b1;
+    --va-color-story: #46b450;
+    --va-color-bug: #d63638;
+    --va-color-task: #72aee6;
+    
+    /* Priority Semantics */
+    --va-prio-low: #2c3338;
+    --va-prio-medium: #e6a23c;
+    --va-prio-high: #e35b5b;
+    --va-prio-blocker: #a00;
+}
+
+/* ==========================================================================
+   2. PERSISTENT LAYOUT WRAPPER & NAV
+   ========================================================================== */
+.va-suite-wrapper {
+    margin: 20px 20px 0 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: var(--va-text-main);
+}
+
+.va-suite-header {
+    background: var(--va-bg-card);
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--va-border-color);
+}
+
+.va-suite-nav .button-primary {
+    background: var(--va-color-requirement);
+    border-color: var(--va-color-requirement);
+}
+
+/* ==========================================================================
+   3. PROJECT DASHBOARD PANEL (SCREEN A)
+   ========================================================================== */
+.va-dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.va-summary-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+.va-kpi-card {
+    background: var(--va-bg-card);
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid var(--va-border-color);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.va-kpi-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: var(--va-text-muted);
+}
+
+.va-kpi-card .va-kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--va-text-main);
+}
+
+.va-dashboard-main {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 782px) {
+    .va-dashboard-main {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   4. THE BACKLOG MATRIX VIEW (SCREEN B)
+   ========================================================================== */
+.va-filter-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: var(--va-bg-card);
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--va-border-color);
+    margin-bottom: 15px;
+}
+
+.va-filter-strip select {
+    min-width: 160px;
+    max-width: 200px;
+}
+
+.va-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--va-bg-card);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--va-border-color);
+}
+
+.va-data-table th, 
+.va-data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--va-border-color);
+}
+
+.va-data-table th {
+    background: #f6f7f7;
+    font-weight: 600;
+}
+
+.va-data-table tbody tr:hover {
+    background: #f9f9f9;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   5. AGILE KANBAN BOARD VIEW (SCREEN C)
+   ========================================================================== */
+.va-board-container {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    align-items: flex-start;
+}
+
+.va-board-column {
+    flex: 1;
+    min-width: 280px;
+    max-width: 360px;
+    background: var(--va-bg-primary);
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid var(--va-border-color);
+    box-sizing: border-box;
+}
+
+.va-board-column h3 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--va-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.va-counter {
+    background: var(--va-border-color);
+    color: var(--va-text-main);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.va-card-dropzone {
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Draggable Ticket Cards */
+.va-ticket-card {
+    background: var(--va-bg-card);
+    border-radius: 4px;
+    padding: 12px;
+    border: 1px solid var(--va-border-color);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    cursor: grab;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.va-ticket-card:active {
+    cursor: grabbing;
+}
+
+.va-ticket-card.va-dragging {
+    opacity: 0.4;
+    border: 1px dashed var(--va-text-muted);
+}
+
+.va-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.va-card-title {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--va-text-main);
+}
+
+.va-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+}
+
+.va-card-key {
+    font-weight: 600;
+    color: var(--va-text-muted);
+}
+
+/* User Avatar Representation */
+.va-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 10px;
+}
+
+/* Dynamic Badge Type Tags */
+.va-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+    color: #fff;
+    text-transform: uppercase;
+}
+.va-type-requirement { background: var(--va-color-requirement); }
+.va-type-feature     { background: var(--va-color-feature); }
+.va-type-story       { background: var(--va-color-story); }
+.va-type-bug         { background: var(--va-color-bug); }
+.va-type-task        { background: var(--va-color-task); }
+
+/* Dynamic Priority Classifications */
+.va-priority {
+    font-size: 11px;
+    font-weight: 500;
+}
+.va-prio-low     { color: var(--va-prio-low); }
+.va-prio-medium  { color: var(--va-prio-medium); }
+.va-prio-high    { color: var(--va-prio-high); }
+.va-prio-blocker { color: var(--va-prio-blocker); font-weight: 700; }
+
+/* ==========================================================================
+   6. DETAILS MODAL SLIDE-OUT OVERLAY (SCREEN D)
+   ========================================================================== */
+.va-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 100000; /* Layers cleanly over WP core administrative shell */
+    display: flex;
+    justify-content: flex-end;
+    transition: opacity 0.3s ease;
+}
+
+.va-modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.va-modal-content {
+    width: 100%;
+    max-width: 800px;
+    height: 100%;
+    background: var(--va-bg-card);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    animation: vaSlideIn 0.25s ease-out;
+}
+
+@keyframes vaSlideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+.va-modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--va-border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f6f7f7;
+}
+
+.va-modal-key-badge {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--va-text-muted);
+}
+
+.va-close-modal {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--va-text-muted);
+}
+
+.va-close-modal:hover {
+    color: var(--va-color-bug);
+}
+
+.va-modal-body {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 5fr 3fr;
+    gap: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+@media (max-width: 600px) {
+    .va-modal-body {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Typography Inputs Configuration */
+.va-input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--va-text-main);
+}
+
+.va-input-flat, 
+.va-textarea-flat,
+.va-modal-sidebar select {
+    width: 100%;
+    border: 1px solid var(--va-border-color);
+    border-radius: 4px;
+    padding: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.va-input-flat:focus, 
+.va-textarea-flat:focus {
+    border-color: var(--va-color-requirement);
+    outline: none;
+    box-shadow: 0 0 0 1px var(--va-color-requirement);
+}
+
+.va-meta-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--va-text-muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
