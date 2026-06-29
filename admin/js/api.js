@@ -1,13 +1,13 @@
 /**
- * Vanilla Fetch Wrapper for VA-Requirement-Admin-Suite REST API
+ * Fetch Wrapper for VA-Requirement-Admin-Suite REST API
  *
  * @package va-requirement-suite
  * @author  Vivek Agrawal
  */
 
 /**
- * Helper to consolidate native fetch headers, including the required WP REST security nonce.
- * This ensures strict admin-only security compliance across asynchronous background streams.
+ * Generates uniform network headers, including the required security token.
+ * This ensures strict administrative authentication across background streams.
  */
 function getHeaders() {
     return {
@@ -17,17 +17,16 @@ function getHeaders() {
 }
 
 /**
- * Helper to parse the base API entry point path safely from the localized global state.
+ * Resolves the absolute endpoint destination path dynamically.
  */
 function getApiUrl(endpoint) {
     const base = window.vaSuiteGlobals ? window.vaSuiteGlobals.root : '/wp-json/';
-    // Returns full clean destination path mapping back to custom API namespace
     return `${base}va-suite/v1${endpoint}`;
 }
 
 /**
  * 1. FETCH INITIALIZATION WORKSPACE DATA
- * Requests project indexes, status taxonomies, and urgency priority levels in a single loop.
+ * Requests projects, available statuses, and priorities to set up the client state.
  */
 export async function fetchWorkspaceData() {
     try {
@@ -40,7 +39,7 @@ export async function fetchWorkspaceData() {
             throw new Error(`Workspace synchronization dropped with status: ${response.status}`);
         }
 
-        return await response.json(); // Serves initialization parameters directly back to app.js
+        return await response.json();
     } catch (error) {
         console.error('API Error [fetchWorkspaceData]:', error);
         throw error;
@@ -48,8 +47,8 @@ export async function fetchWorkspaceData() {
 }
 
 /**
- * 2. FETCH TRACKED ASSET COLLECTIONS (TICKETS)
- * Pulls tracked items from the repository, with optional project boundary isolation constraints.
+ * 2. FETCH TRACKED ASSETS (TICKETS)
+ * Pulls workspace records with optional project isolation filtering.
  */
 export async function fetchTickets(projectId = '') {
     try {
@@ -75,8 +74,8 @@ export async function fetchTickets(projectId = '') {
 }
 
 /**
- * 3. CREATE NEW WORKSPACE TRACKED ASSET
- * Submits a fresh payload to the repository database mapping custom post types and taxonomies.
+ * 3. CREATE NEW WORKSPACE ASSET
+ * Submits a fresh payload to insert a requirement, task, or bug into the database.
  */
 export async function createTicket(ticketData) {
     try {
@@ -98,13 +97,13 @@ export async function createTicket(ticketData) {
 }
 
 /**
- * 4. UPDATE EXISTING ASSET META CHANNELS
- * Pushes general structural changes (such as Title, Descriptions, or Epics) down to specific record nodes.
+ * 4. UPDATE EXISTING ASSET META FIELDS
+ * Pushes localized changes (such as Title or Description) down to a specific record node.
  */
 export async function updateTicketDetails(ticketId, updatedFields) {
     try {
         const response = await fetch(getApiUrl(`/tickets/${ticketId}`), {
-            method: 'POST', // Utilizing editable endpoint setup route mappings
+            method: 'POST',
             headers: getHeaders(),
             body: JSON.stringify(updatedFields)
         });
@@ -121,10 +120,31 @@ export async function updateTicketDetails(ticketId, updatedFields) {
 }
 
 /**
- * 5. UPDATE WORKFLOW TAXONOMY STATUS
- * Optimized pipeline specialized for handling native HTML5 Kanban drag-and-drop actions.
+ * 5. UPDATE WORKFLOW STATUS
+ * Specialized shorthand pipeline optimized for handling native drag-and-drop actions.
  */
 export async function updateTicketStatus(ticketId, targetStatusSlug) {
-    // Reuses core transactional update payload wrapper architecture
     return await updateTicketDetails(ticketId, { status: targetStatusSlug });
+}
+
+/**
+ * 6. DELETE SPECIFIC TRACKING ASSET
+ * Permanently removes a tracking asset from the system via REST[cite: 182].
+ */
+export async function deleteTicket(ticketId) {
+    try {
+        const response = await fetch(getApiUrl(`/tickets/${ticketId}`), {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error(`Asset removal transaction failed with status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error(`API Error [deleteTicket] on ID ${ticketId}:`, error);
+        throw error;
+    }
 }

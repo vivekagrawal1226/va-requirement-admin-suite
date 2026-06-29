@@ -119,8 +119,14 @@ class VA_Suite_Admin_Menu {
                             
                             <div class="va-meta-group" style="margin-top: 15px;">
                                 <label><?php _e( 'Operational Logging', 'va-requirement-suite' ); ?></label>
-                                <div id="modal-time-tracking-summary" style="font-size: 12px; line-color: #646970; background: #f6f7f7; padding: 8px; border-radius: 4px;">
+                                <div id="modal-time-tracking-summary" style="font-size: 12px; color: #646970; background: #f6f7f7; padding: 8px; border-radius: 4px;">
                                     </div>
+                            </div>
+
+                            <div class="va-meta-group" style="margin-top: 30px; border-top: 1px solid #dcdcde; padding-top: 15px;">
+                                <button type="button" id="va-delete-ticket-btn" class="button" style="width: 100%; background: #fcf0f1; border-color: #ffb4b4; color: #d63638; font-weight: 500;">
+                                    <?php _e( 'Delete This Item', 'va-requirement-suite' ); ?>
+                                </button>
                             </div>
                         </aside>
                     </div>

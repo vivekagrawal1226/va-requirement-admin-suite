@@ -13,11 +13,12 @@ let activeTicketInstance = null;
 
 /**
  * 1. INITIALIZE MODAL COMPONENT DOM REFERENCES
- * Binds closing events to the backdrop and structural button elements.
+ * Binds closing events to the backdrop, structural button elements, and the delete trigger.
  */
 export function initTicketModal() {
     const modalOverlay = document.getElementById('va-ticket-modal');
     const closeBtn     = document.getElementById('va-close-modal-btn');
+    const deleteBtn    = document.getElementById('va-delete-ticket-btn');
 
     if (!modalOverlay || !closeBtn) return;
 
@@ -31,15 +32,40 @@ export function initTicketModal() {
         }
     });
 
-    // Bind real-time change event loops to handle auto-saving metadata modifications
+    // Wire up click listener for permanent deletion operation
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', async () => {
+            if (!activeTicketInstance || !confirm('Permanently delete this requirement tracking node?')) return;
+            
+            try {
+                // Dynamically import deleteTicket to execute destruction request
+                const { deleteTicket } = await import('../api.js');
+                await deleteTicket(activeTicketInstance.id);
+                
+                // Wipe out reference from the centralized application state
+                const targetIndex = AppState.tickets.findIndex(t => t.id == activeTicketInstance.id);
+                if (targetIndex !== -1) {
+                    AppState.tickets.splice(targetIndex, 1);
+                }
+                
+                closeTicketModal();
+                router(AppState.currentView); // Forces underlying canvas update repaints
+            } catch (err) {
+                console.error('Operational termination failure encountered:', err);
+            }
+        });
+    }
+
+    // Bind real-time change event loops to handle auto-saving modifications
     initModalAutoSaveListeners();
 }
 
 /**
  * 2. OPEN OVERLAY WINDOW VIEW
  * Populates structural input elements matching the targeted asset's data array profile.
- * * @param {Object} ticket - Single tracked asset entity block[cite: 82].
- * @param {Object} state - Centralized global data context reference[cite: 42].
+ *
+ * @param {Object} ticket - Single tracked asset entity block.
+ * @param {Object} state - Centralized global data context reference.
  */
 export function openTicketModal(ticket, state) {
     activeTicketInstance = ticket;
@@ -47,17 +73,17 @@ export function openTicketModal(ticket, state) {
     const modalOverlay = document.getElementById('va-ticket-modal');
     if (!modalOverlay) return;
 
-    // Populate header metadata tags [cite: 40]
-    document.getElementById('modal-ticket-key').textContent = ticket.key[cite: 40];
-    document.getElementById('modal-ticket-title').value     = ticket.title[cite: 40];
-    document.getElementById('modal-ticket-desc').value      = ticket.description || ''[cite: 40];
+    // Populate header metadata tags
+    document.getElementById('modal-ticket-key').textContent = ticket.key;
+    document.getElementById('modal-ticket-title').value     = ticket.title;
+    document.getElementById('modal-ticket-desc').value      = ticket.description || '';
 
-    // Populate Right Sidebar Selectors (Taxonomy Options mapping) [cite: 40]
-    populateSelectOptions('modal-status-select', state.statuses, ticket.status)[cite: 40];
-    populateSelectOptions('modal-priority-select', state.priorities, ticket.priority)[cite: 40];
+    // Populate Right Sidebar Selectors (Taxonomy Options mapping)
+    populateSelectOptions('modal-status-select', state.statuses, ticket.status);
+    populateSelectOptions('modal-priority-select', state.priorities, ticket.priority);
     
-    // Populate simple parent tracking representation loop [cite: 40]
-    const parentContainer = document.getElementById('modal-parent-select')[cite: 40];
+    // Populate simple parent tracking representation loop
+    const parentContainer = document.getElementById('modal-parent-select');
     if (parentContainer) {
         parentContainer.innerHTML = '<option value="">None / Independent</option>' + 
             state.tickets
@@ -66,7 +92,7 @@ export function openTicketModal(ticket, state) {
                 .join('');
     }
 
-    // Populate historical activity timeline mockup context [cite: 40]
+    // Populate historical activity timeline mockup context
     const streamContainer = document.getElementById('va-modal-activity-stream');
     if (streamContainer) {
         streamContainer.innerHTML = `
@@ -76,20 +102,20 @@ export function openTicketModal(ticket, state) {
         `;
     }
 
-    // Display container layer [cite: 40]
+    // Display container layer
     modalOverlay.style.display = 'flex';
-    modalOverlay.classList.remove('hidden'); [cite: 40]
+    modalOverlay.classList.remove('hidden');
 }
 
 /**
  * 3. CLOSE OVERLAY WINDOW VIEW
- * Clear local reference instances and resets the display constraints safely.
+ * Clears local reference instances and resets the display constraints safely.
  */
 export function closeTicketModal() {
     const modalOverlay = document.getElementById('va-ticket-modal');
     if (!modalOverlay) return;
 
-    modalOverlay.classList.add('hidden'); [cite: 40]
+    modalOverlay.classList.add('hidden');
     modalOverlay.style.display = 'none';
     activeTicketInstance = null;
 }
@@ -110,7 +136,7 @@ function populateSelectOptions(elementId, terms, selectedValue) {
 
 /**
  * 4. AUTO-SAVE HANDLER CONFIGURATION
- * Debounces modifications to ensure network streams sync back to the database automatically[cite: 44, 63].
+ * Debounces modifications to ensure network streams sync back to the database automatically.
  */
 function initModalAutoSaveListeners() {
     const titleInput  = document.getElementById('modal-ticket-title');
@@ -136,7 +162,7 @@ function initModalAutoSaveListeners() {
     if (titleInput) titleInput.addEventListener('input', triggerTextSave);
     if (descInput)  descInput.addEventListener('input', triggerTextSave);
 
-    // Fast tracking taxonomies triggers changes immediately upon selection switch events [cite: 44, 63]
+    // Fast tracking taxonomies trigger updates immediately upon selection switch events
     if (statusSel) {
         statusSel.addEventListener('change', async (e) => {
             if (!activeTicketInstance) return;
@@ -153,18 +179,18 @@ function initModalAutoSaveListeners() {
 }
 
 /**
- * Coordinates API updates with the global state object[cite: 42, 85].
+ * Coordinates API updates with the global state object.
  */
 async function persistChanges(ticketId, fieldDelta) {
     try {
-        // Asynchronously call the API module to commit fields [cite: 85]
-        const updatedRecord = await updateTicketDetails(ticketId, fieldDelta); [cite: 85]
+        // Asynchronously call the API module to commit fields
+        const updatedRecord = await updateTicketDetails(ticketId, fieldDelta);
         
-        // Find reference index matching current local memory cache [cite: 82]
-        const cacheIndex = AppState.tickets.findIndex(t => t.id == ticketId); [cite: 82]
+        // Find reference index matching current local memory cache
+        const cacheIndex = AppState.tickets.findIndex(t => t.id == ticketId);
         if (cacheIndex !== -1) {
-            AppState.tickets[cacheIndex] = updatedRecord; // Sync updated database values locally [cite: 82]
-            router(AppState.currentView); // Refresh background canvas dynamically [cite: 82]
+            AppState.tickets[cacheIndex] = updatedRecord; // Sync updated database values locally
+            router(AppState.currentView); // Refresh background canvas dynamically
         }
     } catch (err) {
         console.error(`Failed to automatically persist tracking state corrections for node: ${ticketId}`, err);

@@ -3,7 +3,7 @@
  * Plugin Name: VA-Requirement-Admin-Suite
  * Plugin URI:  https://agrawalvivek.com/apps/
  * Description: An admin-only requirements and lifecycle management suite built using vanilla HTML, CSS, and JavaScript.
- * Version:     1.0.0
+ * Version:     1.1.0
  * Author:      Vivek Agrawal
  * Text Domain: va-requirement-suite
  * License:     GPL2
@@ -24,13 +24,26 @@ class VA_Requirement_Admin_Suite {
      * Constructor to bind all essential initialization hooks.
      */
     public function __construct() {
-        // Architecture Hooks
+        // Core Architecture Hooks
         add_action( 'init', array( $this, 'register_custom_post_types' ) );
         add_action( 'init', array( $this, 'register_custom_taxonomies' ) );
 
         // Admin Management Panel Hooks
         add_action( 'admin_menu', array( $this, 'add_admin_menu_page' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
+
+        // Load Asynchronous REST API Components
+        $this->includes();
+    }
+
+    /**
+     * Includes backend dependencies required for decoupled communication.
+     */
+    private function includes() {
+        $api_path = plugin_dir_path( __FILE__ ) . 'includes/class-api-endpoints.php';
+        if ( file_exists( $api_path ) ) {
+            require_once $api_path;
+        }
     }
 
     /**
@@ -45,7 +58,7 @@ class VA_Requirement_Admin_Suite {
                 'singular_name' => __( 'VA Project', 'va-requirement-suite' ),
             ),
             'public'              => false,
-            'show_ui'             => true,  // Maintained for data-entry visibility fallback
+            'show_ui'             => true,  // Maintained for fallback data-entry visibility
             'show_in_menu'        => false, // Handled asynchronously via the SPA workspace
             'has_archive'         => false,
             'show_in_rest'        => true,  // Exposes data directly to native fetch loops
@@ -105,7 +118,7 @@ class VA_Requirement_Admin_Suite {
 
     /**
      * 3. WORKSPACE MENU HOOK
-     * Generates a isolated environment hook accessible strictly to administrators.
+     * Generates an isolated environment hook accessible strictly to administrators.
      */
     public function add_admin_menu_page() {
         add_menu_page(
@@ -129,9 +142,9 @@ class VA_Requirement_Admin_Suite {
             <div class="va-suite-header" style="margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                 <h2 style="margin: 0 0 15px 0; font-weight: 600;"><?php _e( 'VA Requirement Admin Suite', 'va-requirement-suite' ); ?></h2>
                 <nav class="va-suite-nav" style="display: flex; gap: 10px;">
-                    <button data-target="dashboard" class="button button-primary va-nav-btn"><?php _e( 'Dashboard', 'va-requirement-suite' ); ?></button>
-                    <button data-target="backlog" class="button va-nav-btn"><?php _e( 'Backlog', 'va-requirement-suite' ); ?></button>
-                    <button data-target="board" class="button va-nav-btn"><?php _e( 'Agile Board', 'va-requirement-suite' ); ?></button>
+                    <button data-target="dashboard" class="button button-primary va-nav-btn" type="button"><?php _e( 'Dashboard', 'va-requirement-suite' ); ?></button>
+                    <button data-target="backlog" class="button va-nav-btn" type="button"><?php _e( 'Backlog', 'va-requirement-suite' ); ?></button>
+                    <button data-target="board" class="button va-nav-btn" type="button"><?php _e( 'Agile Board', 'va-requirement-suite' ); ?></button>
                 </nav>
             </div>
 
@@ -159,7 +172,7 @@ class VA_Requirement_Admin_Suite {
             'va-suite-admin-style', 
             plugin_dir_url( __FILE__ ) . 'admin/css/admin-style.css', 
             array(), 
-            '1.0.0' 
+            '1.1.0' 
         );
 
         // Core App Routing Engine Script
@@ -167,7 +180,7 @@ class VA_Requirement_Admin_Suite {
             'va-suite-app', 
             plugin_dir_url( __FILE__ ) . 'admin/js/app.js', 
             array(), 
-            '1.0.0', 
+            '1.1.0', 
             array( 'in_footer' => true, 'strategy' => 'defer' ) 
         );
 
@@ -192,5 +205,5 @@ class VA_Requirement_Admin_Suite {
     }
 }
 
-// Instantiate the core plugin runtime pipeline.
+// Instantiate the plugin pipeline
 new VA_Requirement_Admin_Suite();
